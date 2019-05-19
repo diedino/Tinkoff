@@ -17,6 +17,7 @@ import android.util.Log;
 
 import com.krasnov.tinkoffandroid.adapters.RecycleViewAdapter;
 import com.krasnov.tinkoffandroid.models.News;
+import com.krasnov.tinkoffandroid.network.ConnectionDetector;
 import com.krasnov.tinkoffandroid.viewmodels.MainActivityViewModel;
 
 import java.util.List;
@@ -39,6 +40,12 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        ConnectionDetector cd = new ConnectionDetector(this);
+
+        if (!cd.isConnected()) {
+            buildeDialog(MainActivity.this).show();
+        }
 
         setContentView(R.layout.activity_main);
 
@@ -92,5 +99,18 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         RecyclerView.LayoutManager linearLayoutManager = new LinearLayoutManager(this);
         mRecycleView.setLayoutManager(linearLayoutManager);
         mRecycleView.setAdapter(mAdapter);
+    }
+
+    private AlertDialog.Builder buildeDialog(Context c) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(c);
+        builder.setTitle("No Internet Connection");
+        builder.setMessage("Check your network. Press ok to exit");
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                finish();
+            }
+        });
+        return builder;
     }
 }
